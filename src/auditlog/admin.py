@@ -14,7 +14,7 @@ try:
     from django.contrib.auth import get_user_model
     User = get_user_model()
 except ImportError:
-    from django.contrib.auth.models import User  # noqa
+    from django.contrib.auth.models import User
 
 action_names = {
     LogEntry.Action.CREATE: _('create'),

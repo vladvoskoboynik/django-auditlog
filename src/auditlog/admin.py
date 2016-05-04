@@ -89,10 +89,6 @@ class LogEntryAdmin(admin.ModelAdmin):
         'changes'
     ]
 
-    list_display_links = [
-        'timestamp',
-        'changes',
-    ]
     list_display = [
         'timestamp',
         'user_link',

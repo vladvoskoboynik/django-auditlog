@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from django.contrib.admin.models import ADDITION, CHANGE, DELETION
+
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.encoding import force_text
@@ -17,9 +17,9 @@ except ImportError:
     from django.contrib.auth.models import User  # noqa
 
 action_names = {
-    ADDITION: _('Addition'),
-    DELETION: _('Deletion'),
-    CHANGE: _('Change'),
+    LogEntry.Action.CREATE: _('create'),
+    LogEntry.Action.UPDATE: _('update'),
+    LogEntry.Action.DELETE: _('delete'),
 }
 
 
@@ -112,7 +112,7 @@ class LogEntryAdmin(admin.ModelAdmin):
         return False
 
     def object_link(self, obj):
-        if obj.action_flag == DELETION:
+        if obj.action == LogEntry.Action.DELETE:
             link = escape(obj.object_repr)
         else:
             ct = obj.content_type
@@ -120,7 +120,7 @@ class LogEntryAdmin(admin.ModelAdmin):
                 link = '<a href="%s">%s</a>' % (
                     reverse(
                         'admin:%s_%s_change' % (ct.app_label, ct.model),
-                        args=[obj.object_id]
+                        args=[obj.object_pk]
                     ),
                     escape(obj.object_repr),
                 )
@@ -132,18 +132,19 @@ class LogEntryAdmin(admin.ModelAdmin):
     object_link.short_description = 'object'
 
     def user_link(self, obj):
-        try:
-            ct = ContentType.objects.get_for_model(type(obj.user))
-            link = '<a href="%s">%s</a>' % (
-                reverse(
-                    'admin:%s_%s_change' % (ct.app_label, ct.model),
-                    args=[obj.user.pk]
-                ),
-                escape(force_text(obj.user)),
-            )
-        except NoReverseMatch:
-            link = escape(force_text(obj.user))
-        return link
+        if obj.actor:
+            try:
+                ct = ContentType.objects.get_for_model(type(obj.actor))
+                link = '<a href="%s">%s</a>' % (
+                    reverse(
+                        'admin:%s_%s_change' % (ct.app_label, ct.model),
+                        args=[obj.actor.pk]
+                    ),
+                    escape(force_text(obj.actor)),
+                )
+            except NoReverseMatch:
+                link = escape(force_text(obj.actor))
+            return link
     user_link.allow_tags = True
     user_link.admin_order_field = 'user'
     user_link.short_description = 'user'
@@ -159,7 +160,7 @@ class LogEntryAdmin(admin.ModelAdmin):
         return actions
 
     def action_description(self, obj):
-        return action_names[obj.action_flag]
+        return action_names[obj.action]
     action_description.short_description = 'Action'
 
 

@@ -54,7 +54,7 @@ class UserListFilter(admin.SimpleListFilter):
 
 
 class LogEntryAdmin(admin.ModelAdmin):
-    date_hierarchy = 'action_time'
+    date_hierarchy = 'timestamp'
 
     readonly_fields = ([f.name for f in LogEntry._meta.fields] +
                        ['object_link', 'action_description', 'user_link'])
@@ -62,7 +62,7 @@ class LogEntryAdmin(admin.ModelAdmin):
     fieldsets = (
         (_('Metadata'), {
             'fields': (
-                'action_time',
+                'timestamp',
                 'user_link',
                 'action_description',
                 'object_link',
@@ -70,7 +70,7 @@ class LogEntryAdmin(admin.ModelAdmin):
         }),
         (_('Detail'), {
             'fields': (
-                'change_message',
+                'changes',
                 'content_type',
                 'object_id',
                 'object_repr',
@@ -86,20 +86,20 @@ class LogEntryAdmin(admin.ModelAdmin):
 
     search_fields = [
         'object_repr',
-        'change_message'
+        'changes'
     ]
 
     list_display_links = [
-        'action_time',
-        'change_message',
+        'timestamp',
+        'changes',
     ]
     list_display = [
-        'action_time',
+        'timestamp',
         'user_link',
         'content_type',
         'object_link',
         'action_description',
-        'change_message',
+        'changes',
     ]
 
     def has_add_permission(self, request):

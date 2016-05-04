@@ -163,4 +163,4 @@ class LogEntryAdmin(admin.ModelAdmin):
     action_description.short_description = 'Action'
 
 
-admin.site.register(LogEntry, LogEntryAdmin)
+admin.site.register(LogEntry, admin.ModelAdmin)
